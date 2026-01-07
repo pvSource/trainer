@@ -1,0 +1,115 @@
+# ============================================
+# Laravel
+# ============================================
+backend/.env
+backend/.env.backup
+backend/.env.production
+backend/.phpunit.result.cache
+backend/.phpunit.cache
+backend/phpunit.xml.bak
+backend/storage/*.key
+backend/storage/pail
+backend/public/hot
+backend/public/storage
+backend/public/build
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+!backend/storage/framework/cache/.gitignore
+!backend/storage/framework/sessions/.gitignore
+!backend/storage/framework/views/.gitignore
+!backend/storage/app/.gitignore
+!backend/storage/app/public/.gitignore
+!backend/storage/app/private/.gitignore
+!backend/storage/logs/.gitignore
+
+# ============================================
+# Composer
+# ============================================
+# vendor/ и composer.lock обычно коммитятся в Laravel проектах
+# Раскомментируйте, если используете другой подход
+# backend/vendor/
+# backend/composer.lock
+backend/auth.json
+
+# ============================================
+# Node / NPM
+# ============================================
+backend/node_modules/
+backend/npm-debug.log
+backend/yarn-error.log
+backend/package-lock.json
+backend/yarn.lock
+
+# ============================================
+# Docker
+# ============================================
+docker/mysql/data/
+docker/redis/data/
+*.log
+
+# ============================================
+# IDE / Editors
+# ============================================
+.idea/
+.vscode/
+.fleet/
+.zed/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Environment files
+# ============================================
+.env
+.env.*
+!.env.example
+
+# ============================================
+# OS files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Temporary files
+# ============================================
+*.tmp
+*.temp
+*.bak
+*.cache
+*.log
+
+# ============================================
+# Build files
+# ============================================
+backend/public/build/
+backend/public/hot
+backend/public/mix-manifest.json
+
+# ============================================
+# Testing
+# ============================================
+backend/.phpunit.cache
+backend/.phpunit.result.cache
+backend/coverage/
+backend/.phpunit.result.cache
+
+# ============================================
+# Project specific
+# ============================================
+# Раскомментируйте, если не хотите коммитить Postman коллекцию
+# postman_collection.json
+

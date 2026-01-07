@@ -1,0 +1,648 @@
+[
+    {
+        "name": "Верх тела",
+        "description": "Мышцы верхней части тела",
+        "code": "top",
+        "level": 1,
+        "children": [
+            {
+                "name": "Грудь",
+                "description": "Мышцы грудной клетки",
+                "code": "top.chest",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Большая грудная",
+                        "description": "Большая грудная мышца (pectoralis major)",
+                        "code": "top.chest.pectoralis_major",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Верх груди",
+                                "description": "Верхняя часть большой грудной мышцы (верхний пучок)",
+                                "code": "top.chest.pectoralis_major",
+                                "level": 4
+                            },
+                            {
+                                "name": "Середина груди",
+                                "description": "Средняя часть большой грудной мышцы (средний пучок)",
+                                "code": "top.chest.pectoralis_major",
+                                "level": 4
+                            },
+                            {
+                                "name": "Низ груди",
+                                "description": "Нижняя часть большой грудной мышцы (нижний пучок)",
+                                "code": "top.chest.pectoralis_major",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Дополнительные мышцы груди",
+                        "description": "Большая грудная мышца (pectoralis major)",
+                        "code": "top.chest.additional",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Малая грудная",
+                                "description": "Малая грудная мышца (pectoralis minor)",
+                                "code": "top.chest.additional.pectoralis_minor",
+                                "level": 4
+                            },
+                            {
+                                "name": "Передняя зубчатая",
+                                "description": "Передняя зубчатая мышца (serratus anterior). Визуально находится на пересечении большой грудной, широчайшей мышцы спины и косыми мышцами живота",
+                                "code": "top.chest.additional.serratus_anterior",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Спина",
+                "description": "Мышцы спины",
+                "code": "top.back",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Широчайшие и синергисты",
+                        "description": "Широчайшая мышца спины (latissimus dorsi)",
+                        "code": "top.back.latissimus_dorsi",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Верхние пучки широчайшей мышцы спины",
+                                "description": "Верхние пучки широчайшей мышцы спины",
+                                "code": "top.back.latissimus_dorsi.top",
+                                "level": 4
+                            },
+                            {
+                                "name": "Нижние пучки широчайшей мышцы спины",
+                                "description": "Нижние пучки широчайшей мышцы спины",
+                                "code": "top.back.latissimus_dorsi.bottom",
+                                "level": 4
+                            },
+                            {
+                                "name": "Большая круглая",
+                                "description": "Большая круглая мышца (teres major)",
+                                "code": "top.back.latissimus_dorsi.teres_major",
+                                "level": 4
+                            }
+                        ]
+
+                    },
+                    {
+                        "name": "Трапеции",
+                        "description": "Трапециевидная мышца (trapezius)",
+                        "code": "top.back.trapezius",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Верхние пучки трапециевидной мышцы",
+                                "description": "Верхние пучки трапециевидной мышцы",
+                                "code": "top.back.trapezius.top",
+                                "level": 4
+                            },
+                            {
+                                "name": "Средние пучки трапециевидной мышцы",
+                                "description": "Средние пучки трапециевидной мышцы",
+                                "code": "top.back.trapezius.middle",
+                                "level": 4
+                            },
+                            {
+                                "name": "Нижние пучки трапециевидной мышцы",
+                                "description": "Нижние пучки трапециевидной мышцы",
+                                "code": "top.back.trapezius.bottom",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Ромбовидные",
+                        "description": "Ромбовидные мышцы (rhomboids)",
+                        "code": "top.back.rhomboids",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Малая ромбовидная мышца",
+                                "description": "Малая ромбовидная мышца (rhomboids minor)",
+                                "code": "top.back.rhomboids.top",
+                                "level": 4
+                            },
+                            {
+                                "name": "Большая ромбовидная мышца",
+                                "description": "Большая ромбовидная мышца (rhomboids major)",
+                                "code": "top.back.rhomboids.middle",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Разгибатели спины",
+                        "description": "Мышцы-разгибатели позвоночника (erector spinae)",
+                        "code": "top.back.erector_spinae",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Остистые мышцы",
+                                "description": "Остистые мышцы (musculus spinalis)",
+                                "code": "top.back.erector_spinae.spinalis",
+                                "level": 4
+                            },
+                            {
+                                "name": "Длиннейшие мышцы",
+                                "description": "Длиннейшие мышцы (musculus sartorius)",
+                                "code": "top.back.erector_spinae.sartorius",
+                                "level": 4
+                            },
+                            {
+                                "name": "Подвздошно-реберные мышцы",
+                                "description": "Подвздошно-реберные мышцы (musculus iliocostalis)",
+                                "code": "top.back.erector_spinae.iliocostalis",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Нижняя часть спины",
+                        "description": "Поясничные мышцы",
+                        "code": "top.back.psoas",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Большая поясничная мышца",
+                                "description": "Большая поясничная мышца (psoas major)",
+                                "code": "top.back.psoas.major",
+                                "level": 4
+                            },
+                            {
+                                "name": "Прочие мышцы поясницы",
+                                "description": "Глубокие мышцы спины, квадратная мышца поясницы, подвздошно-поясничная мышца",
+                                "code": "top.back.psoas.other",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Плечи",
+                "description": "Дельтовидные мышцы",
+                "code": "top.upper",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Дельтовидные мышцы",
+                        "description": "Мышцы вращательной манжеты плеча и большая круглая",
+                        "code": "top.upper.deltoideus",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Передняя дельта",
+                                "description": "Передний пучок дельтовидной мышцы (Ключичная часть)",
+                                "code": "top.upper.deltoideus.front",
+                                "level": 4
+                            },
+                            {
+                                "name": "Средняя дельта",
+                                "description": "Средний пучок дельтовидной мышцы (Акромиальная часть)",
+                                "code": "top.upper.deltoideus.middle",
+                                "level": 4
+                            },
+                            {
+                                "name": "Задняя дельта",
+                                "description": "Задний пучок дельтовидной мышцы (Остистая часть)",
+                                "code": "top.upper.deltoideus.back",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Мышцы вращательной манжеты плеча и др.",
+                        "description": "Мышцы вращательной манжеты плеча и большая круглая",
+                        "code": "top.upper.cuff_rotators",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Малая круглая",
+                                "description": "Малая круглая мышца (teres minor)",
+                                "code": "top.upper.cuff_rotators.teres_minor",
+                                "level": 4
+                            },
+                            {
+                                "name": "Подостная",
+                                "description": "Подостная мышца (infraspinatus)",
+                                "code": "top.upper.cuff_rotators.infraspinatus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Надостная",
+                                "description": "Надостная мышца (supraspinatus)",
+                                "code": "top.upper.cuff_rotators.supraspinatus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Подлопаточная мышца плеча",
+                                "description": "Подлопаточная мышца плеча (musculus subscapularis)",
+                                "code": "top.upper.cuff_rotators.musculus_subscapularis",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Руки",
+                "description": "Мышцы рук",
+                "code": "top.hands",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Бицепс и брахиалис",
+                        "description": "Двуглавая мышца плеча",
+                        "code": "top.hands.biceps",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Длинная головка бицепса",
+                                "description": "Длинная головка двуглавой мышцы плеча",
+                                "code": "top.hands.biceps.long",
+                                "level": 4
+                            },
+                            {
+                                "name": "Короткая головка бицепса",
+                                "description": "Короткая головка двуглавой мышцы плеча",
+                                "code": "top.hands.biceps.short",
+                                "level": 4
+                            },
+                            {
+                                "name": "Брахиалис",
+                                "description": "Плечевая мышца (brachialis)",
+                                "code": "top.hands.biceps.brachialis",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Трицепс",
+                        "description": "Трехглавая мышца плеча",
+                        "code": "top.hands.triceps",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Длинная головка трицепса",
+                                "description": "Длинная головка трехглавой мышцы плеча",
+                                "code": "top.hands.triceps.long",
+                                "level": 4
+                            },
+                            {
+                                "name": "Латеральная головка трицепса",
+                                "description": "Латеральная головка трехглавой мышцы плеча",
+                                "code": "top.hands.triceps.lateral",
+                                "level": 4
+                            },
+                            {
+                                "name": "Медиальная головка трицепса",
+                                "description": "Медиальная головка трехглавой мышцы плеча",
+                                "code": "top.hands.triceps.medial",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Предплечья",
+                        "description": "Мышцы предплечья и кисти",
+                        "code": "top.hands.forearms",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Сгибатели запястья",
+                                "description": "Мышцы-сгибатели запястья",
+                                "code": "top.hands.forearms.wrist_flexors",
+                                "level": 4
+                            },
+                            {
+                                "name": "Разгибатели запястья",
+                                "description": "Мышцы-разгибатели запястья",
+                                "code": "top.hands.forearms.wrist_extensors",
+                                "level": 4
+                            },
+                            {
+                                "name": "Брахиорадиалис",
+                                "description": "Плечелучевая мышца (brachioradialis)",
+                                "code": "top.hands.forearms.brachioradialis",
+                                "level": 4
+                            },
+                            {
+                                "name": "Локтевая мышца",
+                                "description": "Локтевая мышца (anconeus) - разгибает предплечье в локтевом суставе",
+                                "code": "top.hands.forearms.anconeus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Пронаторы",
+                                "description": "Мышцы-пронаторы предплечья",
+                                "code": "top.hands.forearms.pronators",
+                                "level": 4
+                            },
+                            {
+                                "name": "Супинатор",
+                                "description": "Супинатор предплечья (supinator)",
+                                "code": "top.hands.forearms.supinator",
+                                "level": 4
+                            },
+
+                            {
+                                "name": "Сгибатели пальцев",
+                                "description": "Мышцы-сгибатели пальцев",
+                                "code": "top.hands.forearms.finger_flexors",
+                                "level": 4
+                            },
+                            {
+                                "name": "Разгибатели пальцев",
+                                "description": "Мышцы-разгибатели пальцев",
+                                "code": "top.hands.forearms.finger_extensors",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Пресс",
+                "description": "Мышцы живота",
+                "code": "top.abdomen",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Прямая мышца живота",
+                        "description": "Прямая мышца живота (rectus abdominis)",
+                        "code": "top.abdomen.rectus_abdominus",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Верхняя часть прямой мышцы живота",
+                                "description": "Верхняя часть прямой мышцы живота",
+                                "code": "top.abdomen.rectus_abdominus.top",
+                                "level": 4
+                            },
+                            {
+                                "name": "Нижняя часть прямой мышцы живота",
+                                "description": "Нижняя часть прямой мышцы живота",
+                                "code": "top.abdomen.rectus_abdominus.bottom",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Косые мышцы живота",
+                        "description": "Наружная и внутренняя косые мышцы живота",
+                        "code": "top.abdomen.obliquus",
+                        "level": 4,
+                        "children": [
+                            {
+                                "name": "Наружная косая",
+                                "description": "Наружная косая мышца живота (musculus obliquus externus abdominis)",
+                                "code": "top.abdomen.obliquus.externus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Внутренняя косая",
+                                "description": "Внутренняя косая мышца живота (musculus obliquus internus abdominis)",
+                                "code": "top.abdomen.obliquus.internus",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Мышцы кора",
+                        "description": "Поперечная мышца живота",
+                        "code": "top.abdomen.core",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Поперечная мышца живота",
+                                "description": "Поперечная мышца живота (transversus abdominis)",
+                                "code": "top.abdomen.core.transversus",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Шея и голова",
+                "description": "Мышцы шеи и головы",
+                "code": "top.head",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Шея",
+                        "description": "Мышцы шеи",
+                        "code": "top.head.neck",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Передние мышцы шеи (сгибатели)",
+                                "description": "Грудино-ключично-сосцевидная мышца (повороты и наклоны головы вперёд), Лестничные мышцы (помогают в наклоне и дыхании), Подбородочно-подъязычная и др. глубокие мышцы",
+                                "code": "top.head.neck.front",
+                                "level": 4
+                            },
+                            {
+                                "name": "Боковые мышцы (наклоны в сторону)",
+                                "description": "Грудино-ключично-сосцевидная (частично), Лестничные мышцы, Мышца, поднимающая лопатку (верхняя часть)",
+                                "code": "top.head.neck.middle",
+                                "level": 4
+                            },
+                            {
+                                "name": "Задние мышцы шеи (разгибатели)",
+                                "description": "Ременная мышца головы и шеи, Полуостистая мышца головы, Мышца, выпрямляющая позвоночник (шейный отдел)",
+                                "code": "top.head.neck.back",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Низ тела",
+        "description": "Мышцы нижней части тела",
+        "code": "bottom",
+        "level": 1,
+        "children": [
+            {
+                "name": "Ноги",
+                "description": "Мышцы ног",
+                "code": "bottom.legs",
+                "level": 2,
+                "children": [
+                    {
+                        "name": "Квадрицепс",
+                        "description": "Четырехглавая мышца бедра",
+                        "code": "bottom.legs.quadriceps",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Прямая мышца бедра",
+                                "description": "Прямая мышца бедра (rectus femoris)",
+                                "code": "bottom.legs.quadriceps.rectus_femoris",
+                                "level": 4
+                            },
+                            {
+                                "name": "Латеральная широкая",
+                                "description": "Латеральная широкая мышца бедра (vastus lateralis)",
+                                "code": "bottom.legs.quadriceps.vastus_lateralis",
+                                "level": 4
+                            },
+                            {
+                                "name": "Медиальная широкая",
+                                "description": "Медиальная широкая мышца бедра (vastus medialis)",
+                                "code": "bottom.legs.quadriceps.vastus_medialis",
+                                "level": 4
+                            },
+                            {
+                                "name": "Промежуточная широкая",
+                                "description": "Промежуточная широкая мышца бедра (vastus intermedius)",
+                                "code": "bottom.legs.quadriceps.vastus_intermedius",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Бицепс бедра",
+                        "description": "Задняя группа мышц бедра",
+                        "code": "bottom.legs.hamstrings",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Длинная головка бицепса бедра",
+                                "description": "Длинная головка двуглавой мышцы бедра",
+                                "code": "bottom.legs.hamstrings.long",
+                                "level": 4
+                            },
+                            {
+                                "name": "Короткая головка бицепса бедра",
+                                "description": "Короткая головка двуглавой мышцы бедра",
+                                "code": "bottom.legs.hamstrings.short",
+                                "level": 4
+                            },
+                            {
+                                "name": "Полусухожильная",
+                                "description": "Полусухожильная мышца (semitendinosus)",
+                                "code": "bottom.legs.hamstrings.semitendinosus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Полуперепончатая",
+                                "description": "Полуперепончатая мышца (semimembranosus)",
+                                "code": "bottom.legs.hamstrings.semimembranosus",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Ягодичные",
+                        "description": "Ягодичные мышцы",
+                        "code": "bottom.legs.gluteus",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Большая ягодичная",
+                                "description": "Большая ягодичная мышца (gluteus maximus)",
+                                "code": "bottom.legs.gluteus.maximus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Средняя ягодичная",
+                                "description": "Средняя ягодичная мышца (gluteus medius)",
+                                "code": "bottom.legs.gluteus.medius",
+                                "level": 4
+                            },
+                            {
+                                "name": "Малая ягодичная",
+                                "description": "Малая ягодичная мышца (gluteus minimus)",
+                                "code": "bottom.legs.gluteus.minimus",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Икры",
+                        "description": "Мышцы голени",
+                        "code": "bottom.legs.calves",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Икроножная",
+                                "description": "Икроножная мышца (gastrocnemius)",
+                                "code": "bottom.legs.calves.gastrocnemius",
+                                "level": 4
+                            },
+                            {
+                                "name": "Камбаловидная",
+                                "description": "Камбаловидная мышца (soleus)",
+                                "code": "bottom.legs.calves.soleus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Передняя большеберцовая",
+                                "description": "Передняя большеберцовая мышца (tibialis anterior)",
+                                "code": "bottom.legs.calves.tibialis_anterior",
+                                "level": 4
+                            },
+                            {
+                                "name": "Длинный разгибатель пальцев стопы",
+                                "description": "Длинный разгибатель пальцев стопы",
+                                "code": "bottom.legs.calves.medius.toes_extensor",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Приводящие",
+                        "description": "Приводящие мышцы бедра",
+                        "code": "bottom.legs.adductors",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Длинная приводящая",
+                                "description": "Длинная приводящая мышца (adductor longus)",
+                                "code": "bottom.legs.adductors.adductor_longus",
+                                "level": 4
+                            },
+                            {
+                                "name": "Короткая приводящая",
+                                "description": "Короткая приводящая мышца (adductor brevis)",
+                                "code": "bottom.legs.adductors.adductor_brevis",
+                                "level": 4
+                            },
+                            {
+                                "name": "Большая приводящая",
+                                "description": "Большая приводящая мышца (adductor magnus)",
+                                "code": "bottom.legs.adductors.adductor_magnus",
+                                "level": 4
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Отводящие",
+                        "description": "Отводящие мышцы бедра",
+                        "code": "bottom.legs.abductor",
+                        "level": 3,
+                        "children": [
+                            {
+                                "name": "Напрягатель широкой фасции",
+                                "description": "Напрягатель широкой фасции бедра (tensor fasciae latae)",
+                                "code": "bottom.legs.adductors.tensor_fasciae_latae",
+                                "level": 4
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
