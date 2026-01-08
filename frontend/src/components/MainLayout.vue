@@ -19,6 +19,9 @@ async function handleLogout() {
       
       <div class="nav-right">
         <template v-if="authStore.isAuthenticated">
+          <router-link to="/profile" class="profile-link">
+            {{ authStore.user?.name || 'Профиль' }}
+          </router-link>
           <button @click="handleLogout" class="logout-btn">Выйти</button>
         </template>
         <template v-else>
@@ -67,6 +70,24 @@ async function handleLogout() {
 }
 
 .navbar a.router-link-active {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.profile-link {
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.profile-link.router-link-active {
   font-weight: bold;
   background-color: rgba(255, 255, 255, 0.15);
 }

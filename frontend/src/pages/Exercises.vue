@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import {ref, onMounted, reactive} from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
 import MainLayout from '@/components/MainLayout.vue'
@@ -15,6 +15,9 @@ const lastPage = ref(1)
 const searchQuery = ref('')
 const selectedMuscleId = ref(null)
 const availableMuscles = ref([])
+
+const allMuscles = ref([])
+const expandedMuscles = ref({}) // Состояние раскрытых мышц
 
 async function fetchExercises(page = 1) {
   loading.value = true
@@ -43,6 +46,10 @@ async function fetchExercises(page = 1) {
 async function fetchMuscles() {
   try {
     const data = await api('/muscles')
+
+    console.log(data);
+    allMuscles.value = data
+
     // Преобразуем дерево мышц в плоский список для селекта
     const flattenMuscles = (muscles) => {
       let result = []
@@ -80,6 +87,27 @@ function clearFilters() {
   fetchExercises(1)
 }
 
+// Переключение раскрытия/сворачивания мышцы
+function toggleMuscle(muscleId) {
+  expandedMuscles.value[muscleId] = !expandedMuscles.value[muscleId]
+}
+
+// Выбор мышцы для фильтрации
+function selectMuscle(muscleId) {
+  selectedMuscleId.value = muscleId
+  handleSearch()
+}
+
+// Проверка, раскрыта ли мышца
+function isExpanded(muscleId) {
+  return !!expandedMuscles.value[muscleId]
+}
+
+// Проверка, выбрана ли мышца
+function isSelected(muscleId) {
+  return selectedMuscleId.value === muscleId
+}
+
 onMounted(() => {
   fetchExercises()
   fetchMuscles()
@@ -105,32 +133,113 @@ onMounted(() => {
             class="form-input"
           />
           <button @click="handleSearch" class="search-btn">Поиск</button>
+          <button @click="clearFilters" class="clear-btn">Сбросить фильтры</button>
         </div>
-
-        <div class="filter-box">
-          <label for="muscle-filter">Фильтр по мышце:</label>
-          <select
-            id="muscle-filter"
-            v-model="selectedMuscleId"
-            @change="handleSearch"
-            class="form-input"
+      <div class="muscle-filter-tree">
+        <div class="muscle-tree">
+          <div
+            v-for="firstLevelMuscle in allMuscles"
+            :key="firstLevelMuscle.id"
+            class="muscle-item"
           >
-            <option :value="null">Все мышцы</option>
-            <option
-              v-for="muscle in availableMuscles"
-              :key="muscle.id"
-              :value="muscle.id"
+            <div class="muscle-row">
+              <button
+                v-if="firstLevelMuscle.children && firstLevelMuscle.children.length > 0"
+                @click.stop="toggleMuscle(firstLevelMuscle.id)"
+                class="expand-btn"
+              >
+                {{ isExpanded(firstLevelMuscle.id) ? '−' : '+' }}
+              </button>
+              <span v-else class="expand-placeholder"></span>
+              <button
+                @click.stop="selectMuscle(firstLevelMuscle.id)"
+                :class="['muscle-btn', { 'selected': isSelected(firstLevelMuscle.id) }]"
+              >
+                {{ firstLevelMuscle.name }}
+              </button>
+            </div>
+            <div
+              v-if="firstLevelMuscle.children && firstLevelMuscle.children.length > 0 && isExpanded(firstLevelMuscle.id)"
+              class="muscle-children"
             >
-              {{ muscle.name }}
-            </option>
-          </select>
+              <div
+                v-for="secondLevelMuscle in firstLevelMuscle.children"
+                :key="secondLevelMuscle.id"
+                class="muscle-item"
+              >
+                <div class="muscle-row">
+                  <button
+                    v-if="secondLevelMuscle.children && secondLevelMuscle.children.length > 0"
+                    @click.stop="toggleMuscle(secondLevelMuscle.id)"
+                    class="expand-btn"
+                  >
+                    {{ isExpanded(secondLevelMuscle.id) ? '−' : '+' }}
+                  </button>
+                  <span v-else class="expand-placeholder"></span>
+                  <button
+                    @click.stop="selectMuscle(secondLevelMuscle.id)"
+                    :class="['muscle-btn', { 'selected': isSelected(secondLevelMuscle.id) }]"
+                  >
+                    {{ secondLevelMuscle.name }}
+                  </button>
+                </div>
+                <div
+                  v-if="secondLevelMuscle.children && secondLevelMuscle.children.length > 0 && isExpanded(secondLevelMuscle.id)"
+                  class="muscle-children"
+                >
+                  <div
+                    v-for="thirdLevelMuscle in secondLevelMuscle.children"
+                    :key="thirdLevelMuscle.id"
+                    class="muscle-item"
+                  >
+                    <div class="muscle-row">
+                      <button
+                        v-if="thirdLevelMuscle.children && thirdLevelMuscle.children.length > 0"
+                        @click.stop="toggleMuscle(thirdLevelMuscle.id)"
+                        class="expand-btn"
+                      >
+                        {{ isExpanded(thirdLevelMuscle.id) ? '−' : '+' }}
+                      </button>
+                      <span v-else class="expand-placeholder"></span>
+                      <button
+                        @click.stop="selectMuscle(thirdLevelMuscle.id)"
+                        :class="['muscle-btn', { 'selected': isSelected(thirdLevelMuscle.id) }]"
+                      >
+                        {{ thirdLevelMuscle.name }}
+                      </button>
+                    </div>
+                    <div
+                      v-if="thirdLevelMuscle.children && thirdLevelMuscle.children.length > 0 && isExpanded(thirdLevelMuscle.id)"
+                      class="muscle-children"
+                    >
+                      <div
+                        v-for="fourthLevelMuscle in thirdLevelMuscle.children"
+                        :key="fourthLevelMuscle.id"
+                        class="muscle-item"
+                      >
+                        <div class="muscle-row">
+                          <span class="expand-placeholder"></span>
+                          <button
+                            @click.stop="selectMuscle(fourthLevelMuscle.id)"
+                            :class="['muscle-btn', { 'selected': isSelected(fourthLevelMuscle.id) }]"
+                          >
+                            {{ fourthLevelMuscle.name }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <button @click="clearFilters" class="clear-btn">Сбросить фильтры</button>
+      </div>
       </div>
 
+
       <div v-if="loading" class="loading">Загрузка...</div>
-      
+
       <div v-if="error" class="error">
         {{ error }}
       </div>
@@ -149,7 +258,7 @@ onMounted(() => {
           <div class="exercise-header">
             <h3>{{ exercise.name }}</h3>
           </div>
-          
+
           <div v-if="exercise.description" class="exercise-description">
             {{ exercise.description }}
           </div>
@@ -233,10 +342,6 @@ h1 {
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  gap: 15px;
-  align-items: flex-end;
-  flex-wrap: wrap;
 }
 
 .search-box {
@@ -405,6 +510,94 @@ h1 {
 
 .page-info {
   color: #666;
+}
+
+.muscle-filter-tree {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.muscle-filter-tree h2 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.muscle-tree {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.muscle-item {
+  margin-bottom: 4px;
+}
+
+.muscle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.expand-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.expand-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.expand-placeholder {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.muscle-btn {
+  padding: 6px 12px;
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.muscle-btn:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.muscle-btn.selected {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+  font-weight: 500;
+}
+
+.muscle-children {
+  margin-left: 32px;
+  margin-top: 4px;
+  padding-left: 12px;
+  border-left: 2px solid #e9ecef;
 }
 </style>
 

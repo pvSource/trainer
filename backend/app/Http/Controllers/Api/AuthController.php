@@ -80,6 +80,62 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        return response()->json([
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Обновить профиль пользователя
+     */
+    public function update(Request $request)
+    {
+        $user = $request->user();
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ];
+
+        if ($request->filled('muscles_level')) {
+            $rules['muscles_level'] = 'required|integer|min:1|max:4';
+        }
+
+        // Если указан новый пароль, требуем текущий пароль и подтверждение
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required';
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+
+        $validated = $request->validate($rules);
+
+        // Проверяем текущий пароль, если меняется пароль
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'current_password' => ['Текущий пароль указан неверно.'],
+                ]);
+            }
+        }
+
+        // Обновляем данные пользователя
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+
+        if ($request->filled('muscles_level')) {
+            $user->muscles_level = $validated['muscles_level'];
+        }
+
+        // Обновляем пароль, если он указан
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Профиль успешно обновлен',
+            'user' => $user,
+        ]);
     }
 }

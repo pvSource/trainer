@@ -13,6 +13,7 @@ import Exercises from '../pages/Exercises.vue'
 import ExerciseDetail from '../pages/ExerciseDetail.vue'
 import ExerciseCreate from '../pages/ExerciseCreate.vue'
 import ExerciseEdit from '../pages/ExerciseEdit.vue'
+import Profile from '../pages/Profile.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -62,6 +63,11 @@ const routes = [
     path: '/trainings/:id/edit', 
     component: TrainingEdit, 
     props: true,
+    meta: { requiresAuth: true }
+  },
+  { 
+    path: '/profile', 
+    component: Profile,
     meta: { requiresAuth: true }
   }
 ]
