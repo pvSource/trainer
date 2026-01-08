@@ -50,6 +50,7 @@ class MuscleSeeder extends Seeder
             'parent_id' => $parentId,
             'name' => $data['name'],
             'code' => $data['code'],
+            'level' => $data['level'],
             'description' => $data['description'] ?? null,
         ]);
 

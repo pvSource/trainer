@@ -20,19 +20,19 @@
                             {
                                 "name": "Верх груди",
                                 "description": "Верхняя часть большой грудной мышцы (верхний пучок)",
-                                "code": "top.chest.pectoralis_major",
+                                "code": "top.chest.pectoralis_major.top",
                                 "level": 4
                             },
                             {
                                 "name": "Середина груди",
                                 "description": "Средняя часть большой грудной мышцы (средний пучок)",
-                                "code": "top.chest.pectoralis_major",
+                                "code": "top.chest.pectoralis_major.middle",
                                 "level": 4
                             },
                             {
                                 "name": "Низ груди",
                                 "description": "Нижняя часть большой грудной мышцы (нижний пучок)",
-                                "code": "top.chest.pectoralis_major",
+                                "code": "top.chest.pectoralis_major.bottom",
                                 "level": 4
                             }
                         ]

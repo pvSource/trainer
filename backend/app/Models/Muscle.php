@@ -28,7 +28,7 @@ class Muscle extends Model
             'name' => 'string',
             'code' => 'string',
             'level' => 'integer',
-            'description' => 'code',
+            'description' => 'string',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
