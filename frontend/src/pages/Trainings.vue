@@ -35,6 +35,19 @@ function goToCreate() {
   router.push('/trainings/create')
 }
 
+function copyTraining(trainingId, event) {
+  // Останавливаем всплытие события, чтобы не открывалась детальная страница
+  event.stopPropagation()
+  
+  // Переходим на страницу создания с параметром copy_from
+  router.push({
+    path: '/trainings/create',
+    query: {
+      copy_from: trainingId
+    }
+  })
+}
+
 function formatDate(dateString) {
   if (!dateString) return '—'
   const date = new Date(dateString)
@@ -92,7 +105,17 @@ onMounted(() => {
         >
           <div class="training-header">
             <h3>{{ training.name || 'Тренировка без названия' }}</h3>
-            <span class="training-date">{{ formatDate(training.start_at) }}</span>
+            <div class="training-header-actions">
+              <button
+                type="button"
+                @click.stop="copyTraining(training.id, $event)"
+                class="btn-copy"
+                title="Скопировать тренировку"
+              >
+                Скопировать
+              </button>
+              <span class="training-date">{{ formatDate(training.start_at) }}</span>
+            </div>
           </div>
           
           <div v-if="training.description" class="training-description">
@@ -215,6 +238,27 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.training-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-copy {
+  padding: 6px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-copy:hover {
+  background-color: #218838;
 }
 
 .training-header h3 {

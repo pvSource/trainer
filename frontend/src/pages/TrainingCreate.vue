@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { api } from '../services/api'
 import { useMusclesStore } from '@/stores/muscles'
 import MainLayout from '@/components/MainLayout.vue'
 import MuscleFilter from '@/components/MuscleFilter.vue'
 
 const router = useRouter()
+const route = useRoute()
 const musclesStore = useMusclesStore()
 
 const form = ref({
@@ -116,7 +117,47 @@ function goBack() {
   router.push('/trainings')
 }
 
+// Функция для заполнения формы данными из копируемой тренировки
+function fillFormFromTraining(training) {
+  if (!training) return
+  
+  form.value.name = training.name || ''
+  form.value.description = training.description || ''
+  form.value.start_at = new Date().toISOString().slice(0, 16) // Текущая дата
+  form.value.finish_at = '' // Пустая дата окончания
+  
+  // Заполняем упражнения
+  if (training.exercises && Array.isArray(training.exercises)) {
+    form.value.exercises = training.exercises.map(exercise => ({
+      exercise_id: exercise.id,
+      exercise_name: exercise.name,
+      approaches_count: exercise.pivot?.approaches_count || 1,
+      repetitions_count: exercise.pivot?.repetitions_count || 10,
+      weight: exercise.pivot?.weight || null
+    }))
+  }
+}
+
+// Загрузка данных тренировки для копирования
+async function loadTrainingForCopy(trainingId) {
+  try {
+    const training = await api(`/trainings/${trainingId}`)
+    fillFormFromTraining(training)
+    // Удаляем query параметр после загрузки
+    router.replace({ query: {} })
+  } catch (e) {
+    console.error('Ошибка при загрузке тренировки для копирования:', e)
+    error.value = 'Ошибка при загрузке данных тренировки'
+  }
+}
+
 onMounted(() => {
+  // Проверяем, есть ли параметр copy_from в query
+  const copyFromId = route.query.copy_from
+  if (copyFromId) {
+    loadTrainingForCopy(copyFromId)
+  }
+  
   fetchExercises()
   // Загружаем мышцы в store, если они еще не загружены
   if (!musclesStore.loaded) {

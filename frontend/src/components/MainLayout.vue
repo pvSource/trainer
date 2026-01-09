@@ -1,5 +1,6 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth'
+import Footer from '@/components/Footer.vue'
 
 const authStore = useAuthStore()
 
@@ -34,10 +35,22 @@ async function handleLogout() {
     <main class="page">
       <slot />
     </main>
+
+    <Footer />
   </div>
 </template>
 
 <style scoped>
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page {
+  flex: 1;
+}
+
 .navbar {
   padding: 12px 20px;
   background: #222;
