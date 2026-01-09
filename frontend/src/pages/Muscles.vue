@@ -1,29 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { api } from '../services/api'
+import { useMusclesStore } from '@/stores/muscles'
 import MainLayout from '@/components/MainLayout.vue'
 import MuscleItem from '@/components/MuscleItem.vue'
 
-const muscles = ref([])
-const loading = ref(false)
-const error = ref(null)
+const musclesStore = useMusclesStore()
 const router = useRouter()
+
+// Используем данные из store
+const muscles = computed(() => musclesStore.musclesTree)
+const loading = computed(() => musclesStore.loading)
+const error = computed(() => musclesStore.error)
 
 // Состояние раскрытых/свернутых узлов (используем объект вместо Set для реактивности)
 const expanded = ref({})
 
 async function fetchMuscles() {
-  loading.value = true
-  error.value = null
-
   try {
-    const data = await api('/muscles')
-    muscles.value = data
+    await musclesStore.fetchMuscles()
   } catch (e) {
-    error.value = e.message || 'Ошибка загрузки мышц'
-  } finally {
-    loading.value = false
+    console.error('Ошибка загрузки мышц:', e)
   }
 }
 

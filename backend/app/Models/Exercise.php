@@ -34,7 +34,7 @@ class Exercise extends Model
             ->withTimestamps();
     }
 
-// Связь с мышцами (many-to-many через pivot)
+    // Связь с мышцами (many-to-many через pivot)
     public function muscles(): BelongsToMany
     {
         return $this->belongsToMany(Muscle::class, 'exercises_muscles')

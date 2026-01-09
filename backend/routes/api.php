@@ -34,6 +34,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Упражнения (полный CRUD для авторизованных)
     Route::get('/exercises', [ExerciseController::class, 'index']);
     Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
+    Route::get('/exercises/{id}/statistics', [ExerciseController::class, 'statistics']);
     Route::post('/exercises', [ExerciseController::class, 'store']);
     Route::put('/exercises/{id}', [ExerciseController::class, 'update']);
     Route::delete('/exercises/{id}', [ExerciseController::class, 'destroy']);

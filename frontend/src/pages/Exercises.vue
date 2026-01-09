@@ -1,8 +1,11 @@
 <script setup>
-import {ref, onMounted, reactive} from 'vue'
+import {ref, onMounted, reactive, computed} from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
+import { useMusclesStore } from '@/stores/muscles'
+import { useAuthStore } from '@/stores/auth'
 import MainLayout from '@/components/MainLayout.vue'
+import MuscleFilter from '@/components/MuscleFilter.vue'
 
 const exercises = ref([])
 const loading = ref(false)
@@ -11,13 +14,63 @@ const router = useRouter()
 const currentPage = ref(1)
 const lastPage = ref(1)
 
+// Stores
+const musclesStore = useMusclesStore()
+const authStore = useAuthStore()
+
 // Поиск и фильтры
 const searchQuery = ref('')
 const selectedMuscleId = ref(null)
-const availableMuscles = ref([])
 
-const allMuscles = ref([])
-const expandedMuscles = ref({}) // Состояние раскрытых мышц
+// Определяем нужный уровень мышц для отображения
+const targetMuscleLevel = computed(() => {
+  if (selectedMuscleId.value) {
+    // Если выбран фильтр - берем уровень выбранной мышцы
+    const selectedMuscle = musclesStore.findMuscleById(selectedMuscleId.value)
+    return selectedMuscle?.level || 3
+  } else {
+    // Иначе берем уровень из настроек пользователя
+    return authStore.user?.muscles_level || 3
+  }
+})
+
+// Функция для обработки мышц упражнения
+function processExerciseMuscles(exerciseMuscles) {
+  if (!exerciseMuscles || exerciseMuscles.length === 0) {
+    return []
+  }
+
+  // Группируем мышцы по родителям с нужным уровнем
+  const groupedMuscles = new Map()
+
+  exerciseMuscles.forEach(muscle => {
+    // Находим родителя с нужным уровнем
+    const parentMuscle = musclesStore.getMuscleParentByLevel(muscle.id, targetMuscleLevel.value)
+    
+    if (parentMuscle) {
+      const parentId = parentMuscle.id
+      
+      // Если родитель уже есть в группе
+      if (groupedMuscles.has(parentId)) {
+        const existing = groupedMuscles.get(parentId)
+        // Если текущая мышца основная, то родитель тоже основной
+        if (muscle.pivot?.is_primary) {
+          existing.is_primary = true
+        }
+      } else {
+        // Создаем новую запись для родителя
+        groupedMuscles.set(parentId, {
+          id: parentId,
+          name: parentMuscle.name,
+          is_primary: muscle.pivot?.is_primary || false
+        })
+      }
+    }
+  })
+
+  // Преобразуем Map в массив
+  return Array.from(groupedMuscles.values())
+}
 
 async function fetchExercises(page = 1) {
   loading.value = true
@@ -43,25 +96,10 @@ async function fetchExercises(page = 1) {
   }
 }
 
+// Функция загрузки мышц (использует store)
 async function fetchMuscles() {
   try {
-    const data = await api('/muscles')
-
-    console.log(data);
-    allMuscles.value = data
-
-    // Преобразуем дерево мышц в плоский список для селекта
-    const flattenMuscles = (muscles) => {
-      let result = []
-      muscles.forEach(muscle => {
-        result.push({ id: muscle.id, name: muscle.name })
-        if (muscle.children && muscle.children.length > 0) {
-          result = result.concat(flattenMuscles(muscle.children))
-        }
-      })
-      return result
-    }
-    availableMuscles.value = flattenMuscles(data)
+    await musclesStore.fetchMuscles()
   } catch (e) {
     console.error('Ошибка загрузки мышц:', e)
   }
@@ -87,30 +125,19 @@ function clearFilters() {
   fetchExercises(1)
 }
 
-// Переключение раскрытия/сворачивания мышцы
-function toggleMuscle(muscleId) {
-  expandedMuscles.value[muscleId] = !expandedMuscles.value[muscleId]
-}
-
-// Выбор мышцы для фильтрации
-function selectMuscle(muscleId) {
+// Обработчик выбора мышцы из фильтра
+function onMuscleSelect(muscleId) {
   selectedMuscleId.value = muscleId
   handleSearch()
-}
-
-// Проверка, раскрыта ли мышца
-function isExpanded(muscleId) {
-  return !!expandedMuscles.value[muscleId]
-}
-
-// Проверка, выбрана ли мышца
-function isSelected(muscleId) {
-  return selectedMuscleId.value === muscleId
 }
 
 onMounted(() => {
   fetchExercises()
   fetchMuscles()
+  // Загружаем мышцы в store, если они еще не загружены
+  if (!musclesStore.loaded) {
+    fetchMuscles()
+  }
 })
 </script>
 
@@ -135,106 +162,10 @@ onMounted(() => {
           <button @click="handleSearch" class="search-btn">Поиск</button>
           <button @click="clearFilters" class="clear-btn">Сбросить фильтры</button>
         </div>
-      <div class="muscle-filter-tree">
-        <div class="muscle-tree">
-          <div
-            v-for="firstLevelMuscle in allMuscles"
-            :key="firstLevelMuscle.id"
-            class="muscle-item"
-          >
-            <div class="muscle-row">
-              <button
-                v-if="firstLevelMuscle.children && firstLevelMuscle.children.length > 0"
-                @click.stop="toggleMuscle(firstLevelMuscle.id)"
-                class="expand-btn"
-              >
-                {{ isExpanded(firstLevelMuscle.id) ? '−' : '+' }}
-              </button>
-              <span v-else class="expand-placeholder"></span>
-              <button
-                @click.stop="selectMuscle(firstLevelMuscle.id)"
-                :class="['muscle-btn', { 'selected': isSelected(firstLevelMuscle.id) }]"
-              >
-                {{ firstLevelMuscle.name }}
-              </button>
-            </div>
-            <div
-              v-if="firstLevelMuscle.children && firstLevelMuscle.children.length > 0 && isExpanded(firstLevelMuscle.id)"
-              class="muscle-children"
-            >
-              <div
-                v-for="secondLevelMuscle in firstLevelMuscle.children"
-                :key="secondLevelMuscle.id"
-                class="muscle-item"
-              >
-                <div class="muscle-row">
-                  <button
-                    v-if="secondLevelMuscle.children && secondLevelMuscle.children.length > 0"
-                    @click.stop="toggleMuscle(secondLevelMuscle.id)"
-                    class="expand-btn"
-                  >
-                    {{ isExpanded(secondLevelMuscle.id) ? '−' : '+' }}
-                  </button>
-                  <span v-else class="expand-placeholder"></span>
-                  <button
-                    @click.stop="selectMuscle(secondLevelMuscle.id)"
-                    :class="['muscle-btn', { 'selected': isSelected(secondLevelMuscle.id) }]"
-                  >
-                    {{ secondLevelMuscle.name }}
-                  </button>
-                </div>
-                <div
-                  v-if="secondLevelMuscle.children && secondLevelMuscle.children.length > 0 && isExpanded(secondLevelMuscle.id)"
-                  class="muscle-children"
-                >
-                  <div
-                    v-for="thirdLevelMuscle in secondLevelMuscle.children"
-                    :key="thirdLevelMuscle.id"
-                    class="muscle-item"
-                  >
-                    <div class="muscle-row">
-                      <button
-                        v-if="thirdLevelMuscle.children && thirdLevelMuscle.children.length > 0"
-                        @click.stop="toggleMuscle(thirdLevelMuscle.id)"
-                        class="expand-btn"
-                      >
-                        {{ isExpanded(thirdLevelMuscle.id) ? '−' : '+' }}
-                      </button>
-                      <span v-else class="expand-placeholder"></span>
-                      <button
-                        @click.stop="selectMuscle(thirdLevelMuscle.id)"
-                        :class="['muscle-btn', { 'selected': isSelected(thirdLevelMuscle.id) }]"
-                      >
-                        {{ thirdLevelMuscle.name }}
-                      </button>
-                    </div>
-                    <div
-                      v-if="thirdLevelMuscle.children && thirdLevelMuscle.children.length > 0 && isExpanded(thirdLevelMuscle.id)"
-                      class="muscle-children"
-                    >
-                      <div
-                        v-for="fourthLevelMuscle in thirdLevelMuscle.children"
-                        :key="fourthLevelMuscle.id"
-                        class="muscle-item"
-                      >
-                        <div class="muscle-row">
-                          <span class="expand-placeholder"></span>
-                          <button
-                            @click.stop="selectMuscle(fourthLevelMuscle.id)"
-                            :class="['muscle-btn', { 'selected': isSelected(fourthLevelMuscle.id) }]"
-                          >
-                            {{ fourthLevelMuscle.name }}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <MuscleFilter
+          v-model="selectedMuscleId"
+          @select="onMuscleSelect"
+        />
       </div>
 
 
@@ -267,12 +198,12 @@ onMounted(() => {
             <strong>Мышцы:</strong>
             <div class="muscles-tags">
               <span
-                v-for="muscle in exercise.muscles"
+                v-for="muscle in processExerciseMuscles(exercise.muscles)"
                 :key="muscle.id"
-                :class="['muscle-tag', { 'primary': muscle.pivot?.is_primary }]"
+                :class="['muscle-tag', { 'primary': muscle.is_primary }]"
               >
                 {{ muscle.name }}
-                <span v-if="muscle.pivot?.is_primary" class="primary-badge">основная</span>
+                <span v-if="muscle.is_primary" class="primary-badge">основная</span>
               </span>
             </div>
           </div>
@@ -512,92 +443,5 @@ h1 {
   color: #666;
 }
 
-.muscle-filter-tree {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.muscle-filter-tree h2 {
-  margin: 0 0 15px 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-}
-
-.muscle-tree {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.muscle-item {
-  margin-bottom: 4px;
-}
-
-.muscle-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-
-.expand-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  flex-shrink: 0;
-  transition: background-color 0.2s;
-}
-
-.expand-btn:hover {
-  background-color: #f5f5f5;
-}
-
-.expand-placeholder {
-  width: 24px;
-  flex-shrink: 0;
-}
-
-.muscle-btn {
-  padding: 6px 12px;
-  background-color: #f8f9fa;
-  color: #333;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: left;
-  transition: all 0.2s;
-  flex: 1;
-}
-
-.muscle-btn:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
-}
-
-.muscle-btn.selected {
-  background-color: #3498db;
-  color: white;
-  border-color: #2980b9;
-  font-weight: 500;
-}
-
-.muscle-children {
-  margin-left: 32px;
-  margin-top: 4px;
-  padding-left: 12px;
-  border-left: 2px solid #e9ecef;
-}
 </style>
 

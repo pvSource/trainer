@@ -2,9 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
+import { useMusclesStore } from '@/stores/muscles'
 import MainLayout from '@/components/MainLayout.vue'
+import MuscleFilter from '@/components/MuscleFilter.vue'
 
 const router = useRouter()
+const musclesStore = useMusclesStore()
 
 const form = ref({
   name: '',
@@ -19,20 +22,39 @@ const loadingExercises = ref(false)
 const loading = ref(false)
 const error = ref(null)
 
-// Поиск упражнений
+// Поиск и фильтры
 const searchQuery = ref('')
+const selectedMuscleId = ref(null)
 
 async function fetchExercises() {
   loadingExercises.value = true
   try {
-    const params = searchQuery.value ? `?search=${searchQuery.value}` : ''
-    const data = await api(`/exercises${params}`)
+    let url = '/exercises'
+    const params = new URLSearchParams()
+    
+    if (searchQuery.value) {
+      params.append('search', searchQuery.value)
+    }
+    if (selectedMuscleId.value) {
+      params.append('muscle_id', selectedMuscleId.value)
+    }
+    
+    if (params.toString()) {
+      url += '?' + params.toString()
+    }
+    
+    const data = await api(url)
     availableExercises.value = data.data || data
   } catch (e) {
     console.error('Ошибка загрузки упражнений:', e)
   } finally {
     loadingExercises.value = false
   }
+}
+
+// Обработчик выбора мышцы из фильтра
+function onMuscleSelect() {
+  fetchExercises()
 }
 
 function addExercise(exercise) {
@@ -96,6 +118,10 @@ function goBack() {
 
 onMounted(() => {
   fetchExercises()
+  // Загружаем мышцы в store, если они еще не загружены
+  if (!musclesStore.loaded) {
+    musclesStore.fetchMuscles()
+  }
 })
 </script>
 
@@ -158,31 +184,7 @@ onMounted(() => {
         <div class="form-section">
           <h2>Упражнения</h2>
 
-          <div class="exercise-search">
-            <input
-              v-model="searchQuery"
-              @input="fetchExercises"
-              type="text"
-              placeholder="Поиск упражнений..."
-              class="form-input"
-            />
-            <button type="button" @click="fetchExercises" class="search-btn">Поиск</button>
-          </div>
-
-          <div v-if="loadingExercises" class="loading-small">Загрузка упражнений...</div>
-
-          <div v-if="!loadingExercises && availableExercises.length > 0" class="exercises-list">
-            <div
-              v-for="exercise in availableExercises"
-              :key="exercise.id"
-              class="exercise-option"
-              @click="addExercise(exercise)"
-            >
-              <span>{{ exercise.name }}</span>
-              <button type="button" class="add-btn">+ Добавить</button>
-            </div>
-          </div>
-
+          <!-- Добавленные упражнения -->
           <div v-if="form.exercises.length > 0" class="selected-exercises">
             <h3>Добавленные упражнения</h3>
             <div
@@ -228,6 +230,38 @@ onMounted(() => {
                   Удалить
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- Поиск и фильтры -->
+          <div class="exercise-filters">
+            <div class="exercise-search">
+              <input
+                v-model="searchQuery"
+                @input="fetchExercises"
+                type="text"
+                placeholder="Поиск упражнений..."
+                class="form-input"
+              />
+              <button type="button" @click="fetchExercises" class="search-btn">Поиск</button>
+            </div>
+            <MuscleFilter
+              v-model="selectedMuscleId"
+              @select="onMuscleSelect"
+            />
+          </div>
+
+          <div v-if="loadingExercises" class="loading-small">Загрузка упражнений...</div>
+
+          <div v-if="!loadingExercises && availableExercises.length > 0" class="exercises-list">
+            <div
+              v-for="exercise in availableExercises"
+              :key="exercise.id"
+              class="exercise-option"
+              @click="addExercise(exercise)"
+            >
+              <span>{{ exercise.name }}</span>
+              <button type="button" class="add-btn">+ Добавить</button>
             </div>
           </div>
         </div>
@@ -338,10 +372,14 @@ textarea.form-input {
   min-height: 80px;
 }
 
+.exercise-filters {
+  margin-bottom: 20px;
+}
+
 .exercise-search {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .search-btn {

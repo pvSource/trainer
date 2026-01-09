@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
+import { useAuthStore } from '@/stores/auth'
 import MainLayout from '@/components/MainLayout.vue'
+import ExerciseStatisticsChart from '@/components/ExerciseStatisticsChart.vue'
 
 const props = defineProps({
   id: {
@@ -15,6 +17,7 @@ const exercise = ref(null)
 const loading = ref(false)
 const error = ref(null)
 const router = useRouter()
+const authStore = useAuthStore()
 
 async function fetchExercise() {
   loading.value = true
@@ -106,19 +109,11 @@ onMounted(() => {
           <p>Для этого упражнения не указаны мышцы</p>
         </div>
 
-        <div v-if="exercise.trainings && exercise.trainings.length > 0" class="trainings">
-          <h2>Используется в тренировках ({{ exercise.trainings.length }})</h2>
-          <div class="trainings-list">
-            <router-link
-              v-for="training in exercise.trainings"
-              :key="training.id"
-              :to="`/trainings/${training.id}`"
-              class="training-link"
-            >
-              {{ training.name || `Тренировка #${training.id}` }}
-            </router-link>
-          </div>
-        </div>
+        <!-- Статистика (только для авторизованных пользователей) -->
+        <ExerciseStatisticsChart 
+          v-if="authStore.isAuthenticated"
+          :exercise-id="id"
+        />
 
         <div class="actions-bottom">
           <button @click="goBack" class="btn-secondary">Назад</button>
@@ -301,33 +296,6 @@ h2 {
   color: #666;
   background-color: #f8f9fa;
   border-radius: 4px;
-}
-
-.trainings {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 2px solid #e9ecef;
-}
-
-.trainings-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.training-link {
-  padding: 8px 16px;
-  background-color: #3498db;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.training-link:hover {
-  background-color: #2980b9;
 }
 
 .actions-bottom {

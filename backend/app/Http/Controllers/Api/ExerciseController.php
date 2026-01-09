@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
+use App\Models\Muscle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ExerciseController extends Controller
 {
@@ -20,10 +22,42 @@ class ExerciseController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Фильтр по мышце
-        if ($request->has('muscle_id')) {
-            $query->whereHas('muscles', function ($q) use ($request) {
-                $q->where('muscles.id', $request->muscle_id);
+//        if ($request->filled('muscle_id')) {
+//            $muscleLevel = Muscle::findOrFail($request->filled('muscle_id'));
+//        } elseif ($request->user()?->muscles_level) {
+//            $muscleLevel = $request->user->muscles_level;
+//        } else {
+//            $muscleLevel = 3;
+//        }
+
+
+        // Фильтр по мышце + всем потомкам
+        if ($request->filled('muscle_id')) {
+
+            $muscleId = (int) $request->muscle_id;
+
+            $query->whereHas('muscles', function ($q) use ($muscleId) {
+
+                $q->whereIn('muscles.id', function ($sub) use ($muscleId) {
+
+                    $sub->select('id')
+                        ->from(DB::raw("
+                    (
+                        WITH RECURSIVE tree AS (
+                            SELECT id, parent_id
+                            FROM muscles
+                            WHERE id = {$muscleId} AND is_primary = true
+
+                            UNION ALL
+
+                            SELECT m.id, m.parent_id
+                            FROM muscles m
+                            JOIN tree t ON m.parent_id = t.id
+                        )
+                        SELECT id FROM tree
+                    ) AS subtree
+                "));
+                });
             });
         }
 
@@ -118,5 +152,114 @@ class ExerciseController extends Controller
         $exercise->delete();
 
         return response()->json(['message' => 'Exercise deleted successfully'], 200);
+    }
+
+    /**
+     * Получить статистику по упражнению для текущего пользователя
+     * Возвращает данные для графика: вес по датам, сгруппированные по количеству повторений
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function statistics(Request $request, int $id)
+    {
+        $user = $request->user();
+        
+        // Проверяем, что упражнение существует
+        $exercise = Exercise::findOrFail($id);
+
+        // Валидация параметров фильтрации по дате
+        $validated = $request->validate([
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+        ]);
+
+        // Получаем все тренировки пользователя с этим упражнением
+        $query = DB::table('training_exercises')
+            ->join('trainings', 'training_exercises.training_id', '=', 'trainings.id')
+            ->where('trainings.user_id', $user->id)
+            ->where('training_exercises.exercise_id', $id)
+            ->whereNull('training_exercises.deleted_at')
+            ->whereNull('trainings.deleted_at');
+
+        // Применяем фильтры по дате, если они указаны
+        if ($request->filled('date_from')) {
+            $query->whereDate('trainings.start_at', '>=', $validated['date_from']);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('trainings.start_at', '<=', $validated['date_to']);
+        }
+
+        $trainingExercises = $query
+            ->select(
+                'training_exercises.weight',
+                'training_exercises.repetitions_count',
+                'trainings.start_at as training_date',
+                'trainings.id as training_id'
+            )
+            ->orderBy('trainings.start_at', 'asc')
+            ->get();
+
+        // Группируем данные по количеству повторений
+        $series = [];
+        
+        foreach ($trainingExercises as $te) {
+            $repetitions = $te->repetitions_count;
+            $date = date('Y-m-d', strtotime($te->training_date));
+            $weight = (float) $te->weight;
+            $trainingId = (int) $te->training_id;
+
+            // Если серии для этого количества повторений еще нет - создаем
+            if (!isset($series[$repetitions])) {
+                $series[$repetitions] = [];
+            }
+
+            // Добавляем точку данных (если для этой даты уже есть данные, берем максимальный вес)
+            // Сохраняем training_id для точки с максимальным весом
+            if (!isset($series[$repetitions][$date]) || $series[$repetitions][$date]['weight'] < $weight) {
+                $series[$repetitions][$date] = [
+                    'weight' => $weight,
+                    'training_id' => $trainingId
+                ];
+            }
+        }
+
+        // Преобразуем в формат для графика
+        $chartData = [];
+        foreach ($series as $repetitions => $dataByDate) {
+            $points = [];
+            foreach ($dataByDate as $date => $data) {
+                $points[] = [
+                    'date' => $date,
+                    'weight' => $data['weight'],
+                    'training_id' => $data['training_id']
+                ];
+            }
+            
+            // Сортируем по дате
+            usort($points, function($a, $b) {
+                return strcmp($a['date'], $b['date']);
+            });
+
+            $chartData[] = [
+                'repetitions' => $repetitions,
+                'data' => $points
+            ];
+        }
+
+        // Сортируем серии по количеству повторений
+        usort($chartData, function($a, $b) {
+            return $a['repetitions'] <=> $b['repetitions'];
+        });
+
+        return response()->json([
+            'exercise_id' => $id,
+            'exercise_name' => $exercise->name,
+            'date_from' => $validated['date_from'] ?? null,
+            'date_to' => $validated['date_to'] ?? null,
+            'series' => $chartData
+        ]);
     }
 }

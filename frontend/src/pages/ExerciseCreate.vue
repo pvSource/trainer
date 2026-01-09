@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
+import { useMusclesStore } from '@/stores/muscles'
 import MainLayout from '@/components/MainLayout.vue'
 
 const router = useRouter()
+const musclesStore = useMusclesStore()
 
 const form = ref({
   name: '',
@@ -12,8 +14,9 @@ const form = ref({
   muscles: []
 })
 
-const availableMuscles = ref([])
-const loadingMuscles = ref(false)
+// Используем данные из store
+const availableMuscles = computed(() => musclesStore.flatMuscles)
+const loadingMuscles = computed(() => musclesStore.loading)
 const loading = ref(false)
 const error = ref(null)
 
@@ -21,29 +24,10 @@ const error = ref(null)
 const searchQuery = ref('')
 
 async function fetchMuscles() {
-  loadingMuscles.value = true
   try {
-    const data = await api('/muscles')
-    // Преобразуем дерево в плоский список
-    const flattenMuscles = (muscles) => {
-      let result = []
-      muscles.forEach(muscle => {
-        result.push({
-          id: muscle.id,
-          name: muscle.name,
-          level: muscle.level || 1
-        })
-        if (muscle.children && muscle.children.length > 0) {
-          result = result.concat(flattenMuscles(muscle.children))
-        }
-      })
-      return result
-    }
-    availableMuscles.value = flattenMuscles(data)
+    await musclesStore.fetchMuscles()
   } catch (e) {
     console.error('Ошибка загрузки мышц:', e)
-  } finally {
-    loadingMuscles.value = false
   }
 }
 
