@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
+use App\Http\Controllers\Api\MeasurementController;
 use App\Http\Controllers\Api\MuscleController;
 use App\Http\Controllers\Api\TrainingController;
 use Illuminate\Http\Request;
@@ -31,14 +32,23 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('/muscles', [MuscleController::class, 'index']);
     Route::get('/muscles/{id}', [MuscleController::class, 'show']);
 
-    // Упражнения (полный CRUD для авторизованных)
-    Route::get('/exercises', [ExerciseController::class, 'index']);
-    Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
-    Route::get('/exercises/{id}/statistics', [ExerciseController::class, 'statistics']);
-    Route::post('/exercises', [ExerciseController::class, 'store']);
-    Route::put('/exercises/{id}', [ExerciseController::class, 'update']);
-    Route::delete('/exercises/{id}', [ExerciseController::class, 'destroy']);
+            // Упражнения (полный CRUD для авторизованных)
+            Route::get('/exercises', [ExerciseController::class, 'index']);
+            Route::get('/exercises/{id}', [ExerciseController::class, 'show']);
+            Route::get('/exercises/{id}/statistics', [ExerciseController::class, 'statistics']);
+            Route::get('/exercises/{id}/measurements-statistics', [ExerciseController::class, 'measurementsStatistics']);
+            Route::post('/exercises', [ExerciseController::class, 'store']);
+            Route::put('/exercises/{id}', [ExerciseController::class, 'update']);
+            Route::delete('/exercises/{id}', [ExerciseController::class, 'destroy']);
 
     // Тренировки (только для авторизованных)
     Route::apiResource('trainings', TrainingController::class);
+
+    // Замеры (только для авторизованных)
+    Route::get('/measurements', [MeasurementController::class, 'index']);
+    Route::get('/measurements/table', [MeasurementController::class, 'table']); // Данные для таблицы
+    Route::get('/measurements/{id}', [MeasurementController::class, 'show']);
+    Route::post('/measurements/{id}/value', [MeasurementController::class, 'storeValue']); // Добавить значение замера
+    Route::put('/measurements/{id}/value/{valueId}', [MeasurementController::class, 'updateValue']); // Обновить значение
+    Route::delete('/measurements/{id}/value/{valueId}', [MeasurementController::class, 'deleteValue']); // Удалить значение
 });

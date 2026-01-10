@@ -5,6 +5,7 @@ import { api } from '../services/api'
 import { useAuthStore } from '@/stores/auth'
 import MainLayout from '@/components/MainLayout.vue'
 import ExerciseStatisticsChart from '@/components/ExerciseStatisticsChart.vue'
+import MeasurementStatisticsChart from '@/components/MeasurementStatisticsChart.vue'
 
 const props = defineProps({
   id: {
@@ -111,6 +112,12 @@ onMounted(() => {
 
         <!-- Статистика (только для авторизованных пользователей) -->
         <ExerciseStatisticsChart 
+          v-if="authStore.isAuthenticated"
+          :exercise-id="id"
+        />
+
+        <!-- Статистика по размерам тела (только для авторизованных пользователей) -->
+        <MeasurementStatisticsChart 
           v-if="authStore.isAuthenticated"
           :exercise-id="id"
         />

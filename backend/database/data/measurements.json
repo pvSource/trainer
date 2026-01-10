@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Обхват бицепса",
+        "code": "biceps",
+        "unit": "см",
+        "description": "Обхват бицепса",
+        "muscles": ["top.hands.biceps", "top.hands.triceps"]
+    },
+    {
+        "name": "Обхват предплечья",
+        "code": "forearms",
+        "unit": "см",
+        "description": "Обхват предплечья",
+        "muscles": ["top.hands.forearms"]
+    },
+    {
+        "name": "Обхват груди",
+        "code": "chest",
+        "unit": "см",
+        "description": "Обхват груди",
+        "muscles": ["top.chest.pectoralis_major", "top.back.latissimus_dorsi"]
+    },
+    {
+        "name": "Обхват талии",
+        "code": "waist",
+        "unit": "см",
+        "description": "Обхват талии в самом узком месте",
+        "muscles": ["top.abdomen", "top.back.psoas", "top.back.erector_spinae"]
+    },
+    {
+        "name": "Обхват живота",
+        "code": "belly",
+        "unit": "см",
+        "description": "Обхват живота по пупку",
+        "muscles": ["top.abdomen", "top.back.psoas", "top.back.erector_spinae"]
+    },
+    {
+        "name": "Обхват таза/бёдер",
+        "code": "pelvis",
+        "unit": "см",
+        "description": "Самая широкая точка ягодиц",
+        "muscles": ["bottom.legs.gluteus"]
+    },
+    {
+        "name": "Обхват бедра",
+        "code": "thigh",
+        "unit": "см",
+        "description": "Обхват бедра в середине",
+        "muscles": ["bottom.legs.adductors", "bottom.legs.abductor", "bottom.legs.hamstrings", "bottom.legs.quadriceps"]
+    },
+    {
+        "name": "Обхват голени",
+        "code": "calves",
+        "unit": "см",
+        "description": "Обхват голени",
+        "muscles": ["bottom.legs.calves"]
+    },
+    {
+        "name": "Обхват шеи",
+        "code": "neck",
+        "unit": "см",
+        "description": "Обхват шеи",
+        "muscles": ["top.head.neck"]
+    },
+    {
+        "name": "Обхват плеч",
+        "code": "deltoideus",
+        "unit": "см",
+        "description": "Обхват шеи",
+        "muscles": ["top.upper.deltoideus", "top.back.trapezius.middle", "top.back.rhomboids", "top.chest.pectoralis_major.top", "top.chest.additional.pectoralis_minor"]
+    }
+]

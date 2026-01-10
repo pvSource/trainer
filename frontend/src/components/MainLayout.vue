@@ -15,6 +15,7 @@ async function handleLogout() {
       <div class="nav-left">
         <router-link to="/trainings">Тренировки</router-link>
         <router-link to="/exercises">Упражнения</router-link>
+        <router-link to="/measurements">Замеры</router-link>
         <router-link to="/muscles">Мышцы</router-link>
       </div>
       

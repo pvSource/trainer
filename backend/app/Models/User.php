@@ -5,10 +5,12 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Measurement;
 
 class User extends Authenticatable
 {
@@ -54,5 +56,11 @@ class User extends Authenticatable
     public function trainings(): HasMany
     {
         return $this->hasMany(Training::class);
+    }
+    public function measurements(): BelongsToMany
+    {
+        return $this->belongsToMany(Measurement::class, MeasurementUser::class, 'user_id', 'measurement_id')
+            ->withPivot('value', 'measure_at')
+            ->withTimestamps();
     }
 }

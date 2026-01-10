@@ -14,6 +14,7 @@ import Exercises from '../pages/Exercises.vue'
 import ExerciseDetail from '../pages/ExerciseDetail.vue'
 import ExerciseCreate from '../pages/ExerciseCreate.vue'
 import ExerciseEdit from '../pages/ExerciseEdit.vue'
+import Measurements from '../pages/Measurements.vue'
 import Profile from '../pages/Profile.vue'
 
 const routes = [
@@ -64,6 +65,11 @@ const routes = [
     path: '/trainings/:id/edit', 
     component: TrainingEdit, 
     props: true,
+    meta: { requiresAuth: true }
+  },
+  { 
+    path: '/measurements', 
+    component: Measurements,
     meta: { requiresAuth: true }
   },
   { 

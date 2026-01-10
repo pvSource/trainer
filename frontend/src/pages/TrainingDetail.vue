@@ -134,7 +134,9 @@ onMounted(() => {
               class="exercise-item"
             >
               <div class="exercise-header">
-                <h3>{{ exercise.name }}</h3>
+                <router-link :to="`/exercises/${exercise.id}`" class="exercise-link">
+                  <h3>{{ exercise.name }}</h3>
+                </router-link>
               </div>
               <div class="exercise-details">
                 <div v-if="exercise.pivot.approaches_count" class="detail">
@@ -311,10 +313,25 @@ h2 {
   border-left: 4px solid #3498db;
 }
 
+.exercise-header {
+  margin-bottom: 12px;
+}
+
+.exercise-link {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.exercise-link:hover h3 {
+  color: #3498db;
+}
+
 .exercise-header h3 {
-  margin: 0 0 12px 0;
+  margin: 0;
   color: #2c3e50;
   font-size: 1.1rem;
+  transition: color 0.2s;
 }
 
 .exercise-details {
