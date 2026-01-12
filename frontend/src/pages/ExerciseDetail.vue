@@ -20,6 +20,22 @@ const error = ref(null)
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Функция для вычисления даты 3 месяца назад
+function getDateThreeMonthsAgo() {
+  const date = new Date()
+  date.setMonth(date.getMonth() - 3)
+  return date.toISOString().split('T')[0]
+}
+
+// Функция для получения текущей даты в формате YYYY-MM-DD
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0]
+}
+
+// Общие фильтры по дате для графиков статистики (по умолчанию - последние 3 месяца)
+const dateFrom = ref(getDateThreeMonthsAgo())
+const dateTo = ref(getTodayDate())
+
 async function fetchExercise() {
   loading.value = true
   error.value = null
@@ -57,6 +73,22 @@ async function handleDelete() {
   }
 }
 
+// Применить фильтры
+function applyFilters() {
+  // Валидация: если указана дата окончания, она должна быть не раньше даты начала
+  if (dateFrom.value && dateTo.value && dateTo.value < dateFrom.value) {
+    alert('Дата окончания не может быть раньше даты начала')
+    return
+  }
+  // Фильтры применяются автоматически через props в дочерних компонентах
+}
+
+// Сбросить фильтры
+function resetFilters() {
+  dateFrom.value = ''
+  dateTo.value = ''
+}
+
 onMounted(() => {
   fetchExercise()
 })
@@ -75,7 +107,13 @@ onMounted(() => {
 
       <div v-if="!loading && !error && exercise" class="exercise-detail">
         <div class="exercise-header">
-          <h1>{{ exercise.name }}</h1>
+          <div class="exercise-title-section">
+            <h1>{{ exercise.name }}</h1>
+            <div v-if="exercise.creator" class="creator-info">
+              <span class="creator-label">Создатель:</span>
+              <span class="creator-name">{{ exercise.creator.name }}</span>
+            </div>
+          </div>
           <div class="actions">
             <button @click="goToEdit" class="btn-secondary">Редактировать</button>
             <button @click="handleDelete" class="btn-danger">Удалить</button>
@@ -110,16 +148,54 @@ onMounted(() => {
           <p>Для этого упражнения не указаны мышцы</p>
         </div>
 
+        <!-- Общие фильтры по дате для статистики -->
+        <div v-if="authStore.isAuthenticated" class="statistics-filters">
+          <h2>Фильтры по дате</h2>
+          <div class="filters">
+            <div class="filter-group">
+              <label for="date_from">От даты:</label>
+              <input
+                id="date_from"
+                v-model="dateFrom"
+                type="date"
+                class="form-input"
+              />
+            </div>
+            <div class="filter-group">
+              <label for="date_to">До даты:</label>
+              <input
+                id="date_to"
+                v-model="dateTo"
+                type="date"
+                class="form-input"
+                :min="dateFrom"
+              />
+            </div>
+            <div class="filter-actions">
+              <button @click="applyFilters" class="btn-apply">
+                Применить
+              </button>
+              <button @click="resetFilters" class="btn-reset">
+                Сбросить
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Статистика (только для авторизованных пользователей) -->
         <ExerciseStatisticsChart 
           v-if="authStore.isAuthenticated"
           :exercise-id="id"
+          :date-from="dateFrom"
+          :date-to="dateTo"
         />
 
         <!-- Статистика по размерам тела (только для авторизованных пользователей) -->
         <MeasurementStatisticsChart 
           v-if="authStore.isAuthenticated"
           :exercise-id="id"
+          :date-from="dateFrom"
+          :date-to="dateTo"
         />
 
         <div class="actions-bottom">
@@ -175,16 +251,37 @@ onMounted(() => {
 .exercise-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e9ecef;
 }
 
+.exercise-title-section {
+  flex: 1;
+}
+
 h1 {
-  margin: 0;
+  margin: 0 0 8px 0;
   color: #2c3e50;
   font-size: 2rem;
+}
+
+.creator-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.creator-label {
+  font-weight: 500;
+}
+
+.creator-name {
+  color: #3498db;
+  font-weight: 500;
 }
 
 .actions {
@@ -303,6 +400,97 @@ h2 {
   color: #666;
   background-color: #f8f9fa;
   border-radius: 4px;
+}
+
+.statistics-filters {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+}
+
+.statistics-filters h2 {
+  margin: 0 0 20px 0;
+  color: #34495e;
+  font-size: 1.5rem;
+}
+
+.filters {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-weight: 500;
+  color: #34495e;
+  font-size: 14px;
+}
+
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-apply,
+.btn-reset {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-apply {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-apply:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+.btn-apply:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.btn-reset {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.btn-reset:hover:not(:disabled) {
+  background-color: #7f8c8d;
+}
+
+.btn-reset:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
 }
 
 .actions-bottom {

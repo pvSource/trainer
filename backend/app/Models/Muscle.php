@@ -47,10 +47,11 @@ class Muscle extends Model
         return $this->hasMany(Muscle::class, 'parent_id');
     }
 
-    // Связь с упражнениями (many-to-many через pivot)
+    // Связь с упражнениями
     public function exercises(): BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'exercises_muscles')
+            ->using(ExerciseMuscle::class)
             ->withPivot('is_primary')
             ->withTimestamps();
     }

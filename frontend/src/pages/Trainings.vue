@@ -11,12 +11,20 @@ const router = useRouter()
 const currentPage = ref(1)
 const lastPage = ref(1)
 
+// Поиск
+const searchQuery = ref('')
+
 async function fetchTrainings(page = 1) {
   loading.value = true
   error.value = null
 
   try {
-    const data = await api(`/trainings?page=${page}`)
+    let url = `/trainings?page=${page}`
+    if (searchQuery.value) {
+      url += `&search=${encodeURIComponent(searchQuery.value)}`
+    }
+
+    const data = await api(url)
     trainings.value = data.data || data
     currentPage.value = data.current_page || 1
     lastPage.value = data.last_page || 1
@@ -73,6 +81,17 @@ function getDuration(startAt, finishAt) {
   return `${hours} ч ${minutes} мин`
 }
 
+function handleSearch() {
+  currentPage.value = 1
+  fetchTrainings(1)
+}
+
+function clearFilters() {
+  searchQuery.value = ''
+  currentPage.value = 1
+  fetchTrainings(1)
+}
+
 onMounted(() => {
   fetchTrainings()
 })
@@ -84,6 +103,21 @@ onMounted(() => {
       <div class="page-header">
         <h1>Мои тренировки</h1>
         <button @click="goToCreate" class="btn-primary">+ Создать тренировку</button>
+      </div>
+
+      <!-- Поиск -->
+      <div class="filters">
+        <div class="search-box">
+          <input
+            v-model="searchQuery"
+            @keyup.enter="handleSearch"
+            type="text"
+            placeholder="Поиск по названию..."
+            class="form-input"
+          />
+          <button @click="handleSearch" class="search-btn">Поиск</button>
+          <button @click="clearFilters" class="clear-btn">Сбросить фильтры</button>
+        </div>
       </div>
 
       <div v-if="loading" class="loading">Загрузка...</div>
@@ -194,6 +228,46 @@ h1 {
 
 .btn-primary:hover {
   background-color: #2980b9;
+}
+
+.filters {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  gap: 10px;
+}
+
+.form-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.search-btn,
+.clear-btn {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.search-btn:hover,
+.clear-btn:hover {
+  background-color: #5a6268;
 }
 
 .loading,

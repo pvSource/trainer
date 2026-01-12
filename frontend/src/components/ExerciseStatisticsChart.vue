@@ -1,37 +1,6 @@
 <template>
   <div class="statistics-chart">
     <h2>Статистика прогресса</h2>
-    
-    <!-- Фильтры по дате -->
-    <div class="filters">
-      <div class="filter-group">
-        <label for="date_from">От даты:</label>
-        <input
-          id="date_from"
-          v-model="dateFrom"
-          type="date"
-          class="form-input"
-        />
-      </div>
-      <div class="filter-group">
-        <label for="date_to">До даты:</label>
-        <input
-          id="date_to"
-          v-model="dateTo"
-          type="date"
-          class="form-input"
-          :min="dateFrom"
-        />
-      </div>
-      <div class="filter-actions">
-        <button @click="applyFilters" class="btn-apply" :disabled="loading">
-          Применить
-        </button>
-        <button @click="resetFilters" class="btn-reset" :disabled="loading">
-          Сбросить
-        </button>
-      </div>
-    </div>
 
     <div v-if="loading" class="loading">Загрузка статистики...</div>
     <div v-if="error" class="error">{{ error }}</div>
@@ -48,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Line } from 'vue-chartjs'
 import {
@@ -82,6 +51,14 @@ const props = defineProps({
   exerciseId: {
     type: [String, Number],
     required: true
+  },
+  dateFrom: {
+    type: String,
+    default: ''
+  },
+  dateTo: {
+    type: String,
+    default: ''
   }
 })
 
@@ -89,8 +66,6 @@ const router = useRouter()
 const loading = ref(false)
 const error = ref(null)
 const hasData = ref(false)
-const dateFrom = ref('')
-const dateTo = ref('')
 const statisticsData = ref(null)
 
 // Цвета для линий графика
@@ -132,8 +107,20 @@ const chartData = computed(() => {
   const sortedDates = Array.from(allDates).sort()
 
   // Определяем минимальную и максимальную даты для создания непрерывного диапазона
-  const minDate = new Date(sortedDates[0] + 'T00:00:00')
-  const maxDate = new Date(sortedDates[sortedDates.length - 1] + 'T00:00:00')
+  // Если указаны фильтры, используем их, иначе используем даты из данных
+  let minDate, maxDate
+  
+  if (props.dateFrom && props.dateTo) {
+    // Используем фильтры как границы диапазона
+    minDate = new Date(props.dateFrom + 'T00:00:00')
+    maxDate = new Date(props.dateTo + 'T00:00:00')
+  } else if (sortedDates.length > 0) {
+    // Используем даты из данных
+    minDate = new Date(sortedDates[0] + 'T00:00:00')
+    maxDate = new Date(sortedDates[sortedDates.length - 1] + 'T00:00:00')
+  } else {
+    return { datasets: [] }
+  }
 
   // Создаем массив всех дат в диапазоне (непрерывный)
   const allDatesInRange = []
@@ -299,11 +286,11 @@ async function fetchStatistics() {
     let url = `/exercises/${props.exerciseId}/statistics`
     const params = new URLSearchParams()
 
-    if (dateFrom.value) {
-      params.append('date_from', dateFrom.value)
+    if (props.dateFrom) {
+      params.append('date_from', props.dateFrom)
     }
-    if (dateTo.value) {
-      params.append('date_to', dateTo.value)
+    if (props.dateTo) {
+      params.append('date_to', props.dateTo)
     }
 
     if (params.toString()) {
@@ -332,24 +319,10 @@ async function fetchStatistics() {
   }
 }
 
-// Применить фильтры
-function applyFilters() {
-  // Валидация: если указана дата окончания, она должна быть не раньше даты начала
-  if (dateFrom.value && dateTo.value && dateTo.value < dateFrom.value) {
-    error.value = 'Дата окончания не может быть раньше даты начала'
-    return
-  }
-
+// Следим за изменением фильтров и автоматически обновляем данные
+watch(() => [props.dateFrom, props.dateTo], () => {
   fetchStatistics()
-}
-
-// Сбросить фильтры
-function resetFilters() {
-  dateFrom.value = ''
-  dateTo.value = ''
-  error.value = null
-  fetchStatistics()
-}
+}, { deep: true })
 
 onMounted(() => {
   fetchStatistics()
@@ -367,85 +340,6 @@ onMounted(() => {
   margin: 0 0 20px 0;
   color: #34495e;
   font-size: 1.5rem;
-}
-
-.filters {
-  display: flex;
-  gap: 15px;
-  align-items: flex-end;
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.filter-group label {
-  font-weight: 500;
-  color: #34495e;
-  font-size: 14px;
-}
-
-.form-input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3498db;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-apply,
-.btn-reset {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.btn-apply {
-  background-color: #3498db;
-  color: white;
-}
-
-.btn-apply:hover:not(:disabled) {
-  background-color: #2980b9;
-}
-
-.btn-apply:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
-.btn-reset {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.btn-reset:hover:not(:disabled) {
-  background-color: #7f8c8d;
-}
-
-.btn-reset:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
 }
 
 .loading,

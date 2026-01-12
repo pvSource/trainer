@@ -15,6 +15,11 @@ class TrainingController extends Controller
     {
         $query = Training::with(['exercises'])->where('user_id', $request->user()->id);
 
+        // Поиск по названию
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
         $trainings = $query
             ->orderBy('start_at', 'desc')
             ->paginate($request->get('per_page', 15));
@@ -31,7 +36,20 @@ class TrainingController extends Controller
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'start_at' => 'nullable|date',
-            'finish_at' => 'nullable|date|after_or_equal:start_at',
+            'finish_at' => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        // Определяем дату начала для сравнения
+                        $startAt = $request->input('start_at') ?: now();
+                        
+                        if (strtotime($value) < strtotime($startAt)) {
+                            $fail('Дата окончания не может быть раньше даты начала.');
+                        }
+                    }
+                },
+            ],
             'exercises' => 'nullable|array',
             'exercises.*.exercise_id' => 'required|exists:exercises,id',
             'exercises.*.approaches_count' => 'nullable|integer',
@@ -87,7 +105,22 @@ class TrainingController extends Controller
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'start_at' => 'nullable|date',
-            'finish_at' => 'nullable|date|after_or_equal:start_at',
+            'finish_at' => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) use ($request, $training) {
+                    if ($value) {
+                        // Определяем дату начала для сравнения
+                        $startAt = $request->has('start_at') && $request->input('start_at') 
+                            ? $request->input('start_at') 
+                            : $training->start_at;
+                        
+                        if ($startAt && strtotime($value) < strtotime($startAt)) {
+                            $fail('Дата окончания не может быть раньше даты начала.');
+                        }
+                    }
+                },
+            ],
             'exercises' => 'sometimes|array',
             'exercises.*.exercise_id' => 'required|exists:exercises,id',
             'exercises.*.approaches_count' => 'required|integer|min:1',

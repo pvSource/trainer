@@ -17,7 +17,7 @@ class ExerciseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Exercise::with(['muscles']);
+        $query = Exercise::with(['muscles', 'creator']);
 
         // Поиск по названию
         if ($request->has('search')) {
@@ -84,6 +84,7 @@ class ExerciseController extends Controller
         $exercise = Exercise::create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
+            'created_by' => $request->user()->id,
         ]);
 
         // Привязка мышц
@@ -95,7 +96,7 @@ class ExerciseController extends Controller
             }
         }
 
-        $exercise->load('muscles');
+        $exercise->load(['muscles', 'creator']);
 
         return response()->json($exercise, 201);
     }
@@ -105,7 +106,7 @@ class ExerciseController extends Controller
      */
     public function show(string $id)
     {
-        $exercise = Exercise::with(['muscles', 'trainings'])->findOrFail($id);
+        $exercise = Exercise::with(['muscles', 'trainings', 'creator'])->findOrFail($id);
 
         return response()->json($exercise);
     }

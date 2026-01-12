@@ -387,6 +387,16 @@ function addDateColumn() {
   if (!dates.value.includes(newDate.value)) {
     dates.value.push(newDate.value)
     dates.value.sort()
+    
+    // Добавляем пустые значения для новой даты во всех строках измерений
+    measurements.value.forEach(measurement => {
+      if (!measurement.values[newDate.value]) {
+        measurement.values[newDate.value] = {
+          value: null,
+          id: null
+        }
+      }
+    })
   }
 
   showAddColumnDialog.value = false

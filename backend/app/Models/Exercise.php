@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,6 +14,7 @@ class Exercise extends Model
     protected $fillable = [
         'name',
         'description',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -40,5 +42,11 @@ class Exercise extends Model
         return $this->belongsToMany(Muscle::class, 'exercises_muscles')
             ->withPivot('is_primary')
             ->withTimestamps();
+    }
+
+    // Связь с пользователем-создателем
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

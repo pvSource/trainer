@@ -23,7 +23,10 @@ export const useMusclesStore = defineStore('muscles', () => {
         name: muscle.name,
         code: muscle.code,
         level: muscle.level,
-        parent_id: muscle.parent_id
+        parent_id: muscle.parent_id,
+        created_at: muscle.created_at,
+        updated_at: muscle.updated_at,
+        deleted_at: muscle.deleted_at,
       })
       if (muscle.children && muscle.children.length > 0) {
         result = result.concat(flattenMuscles(muscle.children))
@@ -89,7 +92,7 @@ export const useMusclesStore = defineStore('muscles', () => {
   function getMuscleParentByLevel(muscleId, level) {
     // Находим мышцу по ID
     const muscle = findMuscleById(muscleId)
-    
+
     if (!muscle) {
       return null
     }
@@ -106,7 +109,7 @@ export const useMusclesStore = defineStore('muscles', () => {
 
     // Поднимаемся вверх по иерархии, пока не найдем мышцу с нужным level
     let currentMuscle = muscle
-    
+
     while (currentMuscle) {
       // Если достигли нужного уровня - возвращаем
       if (currentMuscle.level === level) {

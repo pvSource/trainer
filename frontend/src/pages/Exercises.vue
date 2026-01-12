@@ -188,6 +188,10 @@ onMounted(() => {
         >
           <div class="exercise-header">
             <h3>{{ exercise.name }}</h3>
+            <div v-if="exercise.creator" class="creator-info">
+              <span class="creator-label">Создатель:</span>
+              <span class="creator-name">{{ exercise.creator.name }}</span>
+            </div>
           </div>
 
           <div v-if="exercise.description" class="exercise-description">
@@ -357,9 +361,26 @@ h1 {
 }
 
 .exercise-header h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: #2c3e50;
   font-size: 1.25rem;
+}
+
+.creator-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.creator-label {
+  font-weight: 500;
+}
+
+.creator-name {
+  color: #3498db;
+  font-weight: 500;
 }
 
 .exercise-description {

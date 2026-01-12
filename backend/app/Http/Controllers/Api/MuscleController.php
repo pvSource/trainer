@@ -3,54 +3,39 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Muscle;
+use App\Services\MuscleService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MuscleController extends Controller
 {
+
+    public function __construct(
+        private readonly MuscleService $muscleService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Muscle::query();
 
-        if ($request->has('level.gte')) {
-            $query->where('level', '>=', $request->get('level.gte'));
-        }
-        if ($request->has('level.lte')) {
-            $query->where('level', '<=', $request->get('level.lte'));
-        }
-        if ($request->has('parent_id')) {
-            $query->where('parent_id', $request->parent_id);
-        }
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->get('name') . '%');
+        $validator = Validator::make($request->all(), [
+            'level.gte' => ['nullable', 'integer', 'min:1', 'max:4'],
+            'level.lte' => ['nullable', 'integer', 'min:1', 'max:4'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $musclesArray = $query->get()->toArray();
+        $validated = $validator->validated();
 
-        $grouped = [];
-        foreach ($musclesArray as $element) {
-            $parent = $element['parent_id'] ?? 0;
-            $grouped[$parent][] = $element;
-        }
+        $result = $this->muscleService->getTree($validated['level.gte'] ?? 1, $validated['level.lte'] ?? 4);
 
-        $build = function($parentId) use (&$build, $grouped) {
-            $branch = [];
-            if (!isset($grouped[$parentId])) return $branch;
-
-            foreach ($grouped[$parentId] as $element) {
-                $element['children'] = $build($element['id']);
-                $branch[] = $element;
-            }
-
-            return $branch;
-        };
-
-        $musclesTree = $build(0); // корни с parent_id = 0 или null
-
-        return response()->json($musclesTree);
+        return response()->json($result);
     }
 
     /**
@@ -58,7 +43,6 @@ class MuscleController extends Controller
      */
     public function show(int $id)
     {
-        $muscle = Muscle::findOrFail($id);
-        return response()->json($muscle);
+        return response()->json($this->muscleService->find($id));
     }
 }
