@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Турник",
+        "code": "pullup_bar"
+    },
+    {
+        "name": "Штанга",
+        "code": "barbell"
+    },
+    {
+        "name": "Гантели",
+        "code": "dumbbells"
+    },
+    {
+        "name": "Штанга",
+        "code": "barbell"
+    },
+    {
+        "name": "Скамья прямая",
+        "code": "straight_bench"
+    },
+    {
+        "name": "Скамья с положительным наклоном (голова вверх)",
+        "code": "incline_bench"
+    },
+    {
+        "name": "Скамья с отрицательным наклоном (голова вниз)",
+        "code": "incline_bench"
+    },
+    {
+        "name": "Гиря",
+        "code": "kettlebell"
+    },
+    {
+        "name": "Эспандер кистевой",
+        "code": "expander"
+    },
+    {
+        "name": "Обратный эспандер для разгибания пальцев",
+        "code": "reverse_expander"
+    }
+]
